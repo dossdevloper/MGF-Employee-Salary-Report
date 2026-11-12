@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Employee Salary Report</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600&display=swap"
+    rel="stylesheet">
+  <!-- Zoho Creator Widget SDK (used only when USE_SAMPLE_DATA = false) -->
+  <script src="https://js.zohostatic.com/creator/widgets/version/2.0/widgetsdk-min.js"></script>
+  <style>
+    :root {
+      --navy: #1d3a4c;
+      --navy-dark: #152c3a;
+      --navy-soft: #2a4d63;
+      --orange: #e8730c;
+      --orange-dark: #cc6208;
+      --orange-tint: #fdf1e6;
+      --bg: #eef1f4;
+      --card: #ffffff;
+      --border: #dfe4ea;
+      --text: #1f2d3a;
+      --muted: #6b7a89;
+      --row-alt: #f8fafb;
+      --row-hover: #fff6ee;
+      --radius: 8px;
+      --shadow: 0 1px 3px rgba(21, 44, 58, .08), 0 1px 2px rgba(21, 44, 58, .04);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Lato", "Segoe UI", Arial, sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .page {
+      padding: 20px 24px 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* ---------- Page header ---------- */
+    .page-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .page-sub {
+      margin: 2px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .head-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* ---------- Buttons ---------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 6px;
+      font: 600 13px "Lato", sans-serif;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: background .15s, border-color .15s;
+      white-space: nowrap;
+    }
+
+    .btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .btn-primary {
+      background: var(--orange);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--orange-dark);
+    }
+
+    .btn-outline {
+      background: #fff;
+      color: var(--navy);
+      border-color: var(--border);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--navy-soft);
+    }
+
+    .btn-navy {
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .btn-navy:hover {
+      background: var(--navy-dark);
+    }
+
+    /* ---------- Cards ---------- */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--navy);
+      color: #fff;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .card-head h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .card-body {
+      padding: 18px;
+    }
+
+    /* ---------- Filter form ---------- */
+    .filter-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1.3fr 1fr 1.4fr 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .period-inputs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .period-inputs>* {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .field input:disabled,
+    .field select:disabled {
+      background: #f3f5f8;
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+
+    .field .hint {
+      font-size: 12px;
+      color: var(--orange-dark);
+      font-weight: 600;
+      margin-top: 5px;
+      min-height: 15px;
+    }
+
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      padding-top: 14px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .presets {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .presets-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      margin-right: 4px;
+    }
+
+    .preset {
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--navy);
+      font: 600 12px "Lato", sans-serif;
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .preset:hover {
+      border-color: var(--orange);
+      color: var(--orange-dark);
+    }
+
+    .preset.active {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: #fff;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      margin-bottom: 6px;
+    }
+
+    .field label .req {
+      color: var(--orange);
+    }
+
+    .field select,
+    .field input {
+      width: 100%;
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font: 14px "Lato", "Noto Sans Tamil", sans-serif;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    .field select:focus,
+    .field input:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(232, 115, 12, .15);
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .form-error {
+      display: none;
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: #fdecec;
+      color: #b42318;
+      font-size: 13px;
+    }
+
+    .active-filters {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--orange-tint);
+      color: var(--orange-dark);
+      border: 1px solid #f6d3b3;
+    }
+
+    /* ---------- Summary tiles ---------- */
+    .tiles {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 16px 0;
+    }
+
+    .tile {
+      padding: 14px 18px;
+      border-left: 4px solid var(--navy);
+    }
+
+    .tile.accent {
+      border-left-color: var(--orange);
+    }
+
+    .tile-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+
+    .tile-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-top: 4px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ---------- Table ---------- */
+    .table-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .search {
+      position: relative;
+      width: 260px;
+      max-width: 100%;
+    }
+
+    .search input {
+      width: 100%;
+      height: 34px;
+      padding: 0 12px 0 32px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font: 13px "Lato", sans-serif;
+      outline: none;
+    }
+
+    .search input:focus {
+      border-color: var(--orange);
+    }
+
+    .search svg {
+      position: absolute;
+      left: 10px;
+      top: 9px;
+      width: 16px;
+      height: 16px;
+      color: var(--muted);
+    }
+
+    .rec-count {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 640px;
+    }
+
+    thead th {
+      background: #f3f5f8;
+      color: var(--navy);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      text-align: left;
+      padding: 11px 16px;
+      border-bottom: 2px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    thead th.num,
+    tbody td.num,
+    tfoot td.num {
+      text-align: right;
+    }
+
+    thead th .arrow {
+      opacity: .35;
+      margin-left: 4px;
+      font-size: 10px;
+    }
+
+    thead th.sorted .arrow {
+      opacity: 1;
+      color: var(--orange);
+    }
+
+    tbody td {
+      padding: 10px 16px;
+      border-bottom: 1px solid #edf0f3;
+      font-variant-numeric: tabular-nums;
+    }
+
+    tbody tr:nth-child(even) {
+      background: var(--row-alt);
+    }
+
+    tbody tr:hover {
+      background: var(--row-hover);
+    }
+
+    .emp-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .emp-name {
+      font-weight: 600;
+      line-height: 1.25;
+    }
+
+    .emp-ta {
+      font: 400 12px "Noto Sans Tamil", "Lato", sans-serif;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      flex: none;
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--navy-soft);
+      color: #fff;
+    }
+
+    tfoot td {
+      padding: 12px 16px;
+      font-weight: 700;
+      background: var(--orange-tint);
+      color: var(--navy);
+      border-top: 2px solid #f6d3b3;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .variant-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      font-size: 12px;
+      font-weight: 600;
+      background: #eaf0f4;
+      color: var(--navy-soft);
+    }
+
+    .variant-ta {
+      display: block;
+      margin-top: 3px;
+      font: 400 12px "Noto Sans Tamil", "Lato", sans-serif;
+      color: var(--muted);
+    }
+
+    #variantTable tbody tr {
+      cursor: pointer;
+    }
+
+    #variantTable tbody tr.selected {
+      background: var(--orange-tint);
+    }
+
+    #variantTable tbody tr.selected td:first-child {
+      box-shadow: inset 3px 0 0 var(--orange);
+    }
+
+    .share-bar {
+      display: inline-block;
+      width: 80px;
+      height: 6px;
+      border-radius: 3px;
+      background: #edf0f3;
+      margin-right: 8px;
+      vertical-align: middle;
+      overflow: hidden;
+    }
+
+    .share-bar span {
+      display: block;
+      height: 100%;
+      background: var(--orange);
+    }
+
+    .card+.card {
+      margin-top: 16px;
+    }
+
+    .empty {
+      padding: 48px 16px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .empty strong {
+      display: block;
+      color: var(--navy);
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    /* ---------- Grouped table (Company > Variant > Employee) ---------- */
+    .grouped thead th {
+      cursor: default;
+    }
+
+    .grouped tbody tr:nth-child(even) {
+      background: none;
+    }
+
+    .grouped tbody tr:hover {
+      background: var(--row-hover);
+    }
+
+    .grouped tbody tr.grp-co,
+    .grouped tbody tr.grp-co:hover {
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .grp-co td {
+      padding: 11px 16px;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: .02em;
+      border-bottom: none;
+    }
+
+    .grp-count {
+      margin-left: 8px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .16);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+
+    .grouped tbody tr.grp-var,
+    .grouped tbody tr.grp-var:hover {
+      background: var(--orange-tint);
+    }
+
+    .grp-var td {
+      font-weight: 700;
+      color: var(--navy);
+      border-bottom: 1px solid #f6d3b3;
+    }
+
+    .grp-var td:first-child {
+      box-shadow: inset 3px 0 0 var(--orange);
+    }
+
+    /* ---------- Pagination ---------- */
+    .pager {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .pager-btns {
+      display: flex;
+      gap: 4px;
+    }
+
+    .pg {
+      min-width: 32px;
+      height: 32px;
+      padding: 0 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--navy);
+      font: 600 13px "Lato", sans-serif;
+      cursor: pointer;
+    }
+
+    .pg.active {
+      background: var(--orange);
+      border-color: var(--orange);
+      color: #fff;
+    }
+
+    .pg:disabled {
+      opacity: .45;
+      cursor: default;
+    }
+
+    .pager select {
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0 6px;
+      font: 13px "Lato", sans-serif;
+    }
+
+    .loading {
+      padding: 40px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 1100px) {
+      .filter-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .filter-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .field-period-value {
+        grid-column: 1 / -1;
+      }
+
+      .tiles {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .page {
+        padding: 16px;
+      }
+
+      .filter-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .tiles {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .tile-value {
+        font-size: 18px;
+      }
+    }
+
+    /* ---------- Print ---------- */
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .head-actions,
+      .filter-card,
+      .table-tools,
+      .pager {
+        display: none !important;
+      }
+
+      .card {
+        box-shadow: none;
+      }
+
+      tbody tr:hover {
+        background: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <!-- Page header -->
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">Employee Salary Report</h1>
+        <p class="page-sub">Day-wise quantity and amount by employee</p>
+      </div>
+      <div class="head-actions">
+        <button class="btn btn-outline" id="btnPrint" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+            <rect x="6" y="14" width="12" height="8" />
+          </svg>
+          Print
+        </button>
+        <button class="btn btn-primary" id="btnExport" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+          </svg>
+          Export CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- Main fields: filter -->
+    <div class="card filter-card">
+      <div class="card-head">
+        <h2>Filter</h2>
+      </div>
+      <div class="card-body">
+        <form id="filterForm" autocomplete="off">
+          <div class="filter-grid">
+            <div class="field field-emp">
+              <label for="fEmployee">Employee Name</label>
+              <select id="fEmployee">
+                <option value="">All Employees</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="fVariant">Packing Variant</label>
+              <select id="fVariant">
+                <option value="">All Variants</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="fPeriod">Period</label>
+              <select id="fPeriod">
+                <option value="all">All Dates</option>
+                <option value="today">Today</option>
+                <option value="week">Week</option>
+                <option value="month">Month</option>
+                <option value="year">Year</option>
+                <option value="custom">Custom Range</option>
+              </select>
+            </div>
+            <div class="field field-period-value">
+              <label id="periodLabel">Select Period</label>
+              <div class="period-inputs">
+                <input type="date" id="fWeekDay" title="Pick any day in the week" hidden>
+                <select id="fMonth" hidden>
+                  <option value="0">January</option>
+                  <option value="1">February</option>
+                  <option value="2">March</option>
+                  <option value="3">April</option>
+                  <option value="4">May</option>
+                  <option value="5">June</option>
+                  <option value="6">July</option>
+                  <option value="7">August</option>
+                  <option value="8">September</option>
+                  <option value="9">October</option>
+                  <option value="10">November</option>
+                  <option value="11">December</option>
+                </select>
+                <select id="fYear" hidden></select>
+                <input type="text" id="fNone" value="—" disabled>
+              </div>
+              <div class="hint" id="periodHint"></div>
+            </div>
+            <div class="field">
+              <label for="fStart">Start Date</label>
+              <input type="date" id="fStart">
+            </div>
+            <div class="field">
+              <label for="fEnd">End Date</label>
+              <input type="date" id="fEnd">
+            </div>
+          </div>
+          <div class="filter-bar">
+            <div class="presets" id="presets">
+              <span class="presets-label">Quick</span>
+              <button type="button" class="preset" data-preset="today">Today</button>
+              <button type="button" class="preset" data-preset="thisWeek">This Week</button>
+              <button type="button" class="preset" data-preset="lastWeek">Last Week</button>
+              <button type="button" class="preset" data-preset="thisMonth">This Month</button>
+              <button type="button" class="preset" data-preset="lastMonth">Last Month</button>
+              <button type="button" class="preset" data-preset="thisYear">This Year</button>
+              <button type="button" class="preset" data-preset="lastYear">Last Year</button>
+            </div>
+            <div class="filter-actions">
+              <button type="submit" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" />
+                </svg>
+                Apply Filter
+              </button>
+              <button type="button" class="btn btn-outline" id="btnReset">Reset</button>
+            </div>
+          </div>
+        </form>
+        <div class="form-error" id="formError"></div>
+        <div class="active-filters" id="activeFilters"></div>
+      </div>
+    </div>
+
+    <!-- Summary tiles -->
+    <div class="tiles">
+      <div class="card tile">
+        <div class="tile-label">Employees</div>
+        <div class="tile-value" id="tEmp">0</div>
+      </div>
+      <div class="card tile">
+        <div class="tile-label">Records</div>
+        <div class="tile-value" id="tRec">0</div>
+      </div>
+      <div class="card tile accent">
+        <div class="tile-label">Total Quantity</div>
+        <div class="tile-value" id="tQty">0</div>
+      </div>
+      <div class="card tile accent">
+        <div class="tile-label">Total Amount</div>
+        <div class="tile-value" id="tAmt">₹0</div>
+      </div>
+    </div>
+
+    <!-- Subform table -->
+    <div class="card">
+      <div class="card-head">
+        <h2>Salary Details</h2>
+      </div>
+      <div class="table-tools">
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <input type="search" id="fSearch" placeholder="Search in results…">
+        </div>
+        <span class="rec-count" id="recCount"></span>
+      </div>
+      <div class="table-wrap">
+        <table class="grouped">
+          <thead>
+            <tr>
+              <th style="width:70px">S.No</th>
+              <th>Employee Name</th>
+              <th>Date</th>
+              <th class="num">Quantity</th>
+              <th class="num">Amount</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr>
+              <td colspan="5" class="loading">Loading records…</td>
+            </tr>
+          </tbody>
+          <tfoot id="tfoot"></tfoot>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* ================= CONFIG ================= */
+    // Set to false to load live data from Zoho Creator.
+    var USE_SAMPLE_DATA = true;
+    var ZOHO_CONFIG = {
+      appName: "mgf-manufacturing",          // app link name
+      reportName: "Employee_Salary_Report",  // report link name
+      fields: {                              // field link names in the report
+        employee: "Employee_Name",
+        date: "Date_field",
+        variant: "Packing_Variant",
+        quantity: "Quantity",
+        amount: "Amount"
+      }
+    };
+
+    /* ================= COMPANY / VARIANT / EMPLOYEE MASTER (from Pay_Sheet.xlsx) =================
+       Group: 1.KATTU SALARY FOR UNITS  கட்டு சம்பளம் | Period: 1-Oct-26 to 31-Oct-26
+       COMPANIES : [company, Tamil name]
+       EMP_MASTER: [company, employee label, Tamil name]
+       PAY_DATA  : [employee index, variant index, quantity, amount]  (one row per employee + variant) */
+    var COMPANIES = [["AYYANAR", "அய்யனார் கம்பெனி"], ["NAGAR", "நகர் கம்பெனி"], ["SHED", "செட் கம்பெனி"], ["VANDIYUR", "வண்டியூர் கம்பெனி"]];
+    var PACKING_VARIANTS = ["KATTU PACKING", "PACKET PACKING", "POUCH EDAI PACKING", "POUCH LABEL EDAI PACKING", "COMPANY WORK", "MACHINE WORK", "POUCH PACKING"];
+    var EMP_MASTER = [["AYYANAR", "DHANALAKSHMI - KATTU - AYYANAR", "தனலட்சுமி"], ["AYYANAR", "KALAISELVI - KATTU - AYYANAR", "கலைச்செல்வி"], ["AYYANAR", "LATHA KATTU AYYANAR", ""], ["AYYANAR", "MEENA - KATTU - AYYANAR", "மீனா"], ["AYYANAR", "MEENAKSHI - KATTU - AYYANAR", "மீனாட்சி"], ["AYYANAR", "MURUGESWARI - KATTU - AYYANAR", "முருகேஸ்வரி"], ["AYYANAR", "PRIYA - KATTU - AYYANAR", "பிரியா"], ["AYYANAR", "RAJA KATTU AYYANAR", ""], ["AYYANAR", "SANTHOSH - KATTU - AYYANAR", "சந்தோஷ்"], ["AYYANAR", "SATHISH - KATTU - AYYANAR", ""], ["AYYANAR", "SUMITHRA - KATTU - AYYANAR", ""], ["AYYANAR", "VEERALAKSHMI - KATTU - AYYANAR", ""], ["AYYANAR", "VINOTH - KATTU - AYYANAR", "வினோத்"], ["AYYANAR", "YOGESH - KATTU - AYYANAR", "யோகேஷ்"], ["NAGAR", "BANU - KATTU - NAGAR", "பானு"], ["NAGAR", "BARKAVI - KATTU - NAGAR", "பார்கவி"], ["NAGAR", "DEEPA - KATTU - NAGAR", ""], ["NAGAR", "ESWARI - KATTU - NAGAR", "ஈஸ்வரி"], ["NAGAR", "FATHIMAA - KATTU - NAGAR", "பாத்திமா"], ["NAGAR", "GUNA KATTU NAGAR", ""], ["NAGAR", "MALAIARASI KATTU NAGAR", ""], ["NAGAR", "NAGOORAMMAL - KATTU - NAGAR", "நாகூரம்மாள்"], ["NAGAR", "PANDIAMMAL - KATTU - NAGAR", "பாண்டியம்மாள்"], ["NAGAR", "PARVEEN - KATTU - NAGAR", "பர்வீன்"], ["NAGAR", "RUBY - KATTU - NAGAR", "ரூபி"], ["NAGAR", "SANTHIYA KATTU NAGAR", "சந்தியா"], ["NAGAR", "SCHOOL FATHIMA - KATTU - NAGAR", ""], ["NAGAR", "SYED ALI FATHIMA - KATTU - NAGAR", "ஹைசம்"], ["NAGAR", "TAJ - KATTU - NAGAR", "மும்தாஜ்"], ["SHED", "BALKEES - KATTU - SHED", "பல்கீஸ்"], ["SHED", "EESWARI - KATTU - SHED", "ஈஸ்வரி"], ["SHED", "FATHIMA - KATTU - SHED", "பாத்திமா"], ["SHED", "JAYANTHI - KATTU - SHED", "ஜெயந்தி"], ["SHED", "JEYARANI - KATTU - SHED", "ஜெயராணி"], ["SHED", "KANIMOZHI - KATTU - SHED", "கனிமொழி"], ["SHED", "MALATHI - KATTU - SHED", "மாலதி"], ["SHED", "MANJULA - KATTU - SHED", "மஞ்சுளா"], ["SHED", "MARIYAMMAL - KATTU - SHED", "மாரியம்மாள்"], ["SHED", "MUTHU - KATTU - SHED", "முத்து பீவி"], ["SHED", "PRIYA - KATTU - SHED", "பிரியா"], ["SHED", "RADHA - KATTU - SHED", "ராதா"], ["SHED", "RANI - KATTU - SHED", "ராணி"], ["SHED", "SARATHY - KATTU - SHED", "சாரதி"], ["SHED", "SELVI - KATTU - SHED", "செல்வி"], ["VANDIYUR", "BOOMA - KATTU - VANDIYUR", "பூமா"], ["VANDIYUR", "CHITRA - KATTU - VANDIYUR", "சித்ரா"], ["VANDIYUR", "EESWARI - KATTU - VANDIYUR", "ஈஸ்வரி"], ["VANDIYUR", "ILAKKIYA - KATTU - VANDIYUR", "இலக்கியா"], ["VANDIYUR", "KASTHURI - KATTU - VANDIYUR", "கஸ்தூரி"], ["VANDIYUR", "KAVITHA - KATTU - VANDIYUR", "கவிதா"], ["VANDIYUR", "LAKSHMI - KATTU - VANDIYUR", "லட்சுமி"], ["VANDIYUR", "PONMANI - KATTU - VANDIYUR", "பொன்மணி"], ["VANDIYUR", "SONA - KATTU - VANDIYUR", "சோனா"]];
+    var PAY_DATA = [[0, 0, 5520.0, 3988.2], [0, 1, 1999.0, 2952], [0, 4, 9.5, 380], [0, 5, 38.5, 3307.5], [1, 0, 10870.0, 7152.75], [1, 1, 1210.0, 1330], [1, 2, 7400.0, 962], [2, 1, 1881.0, 1881], [2, 4, 104.5, 5272.5], [3, 0, 12398.0, 8442.03], [3, 1, 519.0, 569], [3, 2, 4100.0, 533], [4, 0, 13830.0, 8246.7], [4, 1, 1080.0, 1080], [4, 2, 4000.0, 520], [5, 0, 12588.0, 8268.63], [5, 1, 960.0, 993], [5, 2, 6200.0, 806], [6, 0, 17023.0, 10492.23], [6, 1, 1485.0, 1592], [6, 2, 5300.0, 689], [7, 1, 147.0, 147], [8, 0, 0, 459], [9, 4, 102.5, 5898.5], [10, 0, 9703.0, 5815.53], [10, 1, 1424.0, 1424], [10, 2, 4500.0, 585], [11, 1, 5824.0, 5824], [11, 4, 10.0, 1276.5], [12, 1, 603.0, 603], [12, 3, 150.0, 0], [13, 0, 18368.0, 11127.18], [13, 1, 2200.0, 2600], [13, 2, 10800.0, 1404], [14, 0, 13550.0, 8466], [15, 0, 12150.0, 8185.5], [16, 0, 15800.0, 8619], [17, 0, 21900.0, 13311], [18, 0, 6200.0, 4386], [19, 0, 7300.0, 4029], [20, 0, 12800.0, 8058], [21, 0, 24700.0, 13158], [22, 0, 11175.0, 7229.25], [23, 0, 10900.0, 6477], [24, 0, 15125.0, 9702.75], [25, 0, 14600.0, 8313], [26, 0, 1800.0, 306], [27, 0, 16000.0, 8160], [28, 0, 24750.0, 15912], [29, 0, 11820.0, 6818.7], [29, 1, 356.0, 360], [30, 0, 20125.0, 12648], [30, 1, 309.0, 473], [31, 0, 4450.0, 5227.5], [31, 1, 0, 4], [32, 0, 15540.0, 10500.9], [32, 1, 227.0, 231], [33, 0, 13810.0, 7859.1], [33, 1, 174.0, 203], [34, 0, 19915.0, 12719.4], [34, 1, 277.0, 726], [35, 0, 19615.0, 10003.65], [35, 1, 280.0, 280], [36, 0, 43325.0, 26160.45], [36, 1, 385.0, 419], [37, 0, 19770.0, 10936.95], [37, 1, 235.0, 335], [38, 0, 18465.0, 10692.15], [38, 1, 354.0, 398], [39, 0, 16705.0, 9067.8], [39, 1, 260.0, 260], [40, 0, 14815.0, 8932.65], [40, 1, 290.0, 314], [41, 0, 14035.0, 7157.85], [41, 1, 163.0, 163], [42, 0, 34945.0, 21468.45], [42, 1, 418.0, 462], [43, 0, 11115.0, 5668.65], [43, 1, 132.0, 132], [44, 0, 23450.0, 13713.9], [45, 0, 16850.0, 10067.4], [46, 0, 21711.0, 13403.31], [47, 0, 1500.0, 765], [48, 0, 16340.0, 9271.8], [49, 0, 25260.0, 15294.9], [50, 0, 18310.0, 11265.9], [51, 0, 16730.0, 10715.1], [52, 0, 26909.0, 16054.29]];
+
+    var COMPANY_TAMIL = {}, EMP_TAMIL = {}, EMP_COMPANY = {};
+    COMPANIES.forEach(function (c) { COMPANY_TAMIL[c[0]] = c[1]; });
+    EMP_MASTER.forEach(function (e) { EMP_COMPANY[e[1]] = e[0]; EMP_TAMIL[e[1]] = e[2]; });
+
+    /* ================= SAMPLE RECORDS (static; pay-sheet totals dated at period end) ================= */
+    var SAMPLE_RECORDS = PAY_DATA.map(function (d) {
+      return { employee: EMP_MASTER[d[0]][1], date: "2026-10-31", variant: PACKING_VARIANTS[d[1]], quantity: d[2], amount: d[3] };
+    });
+
+    /* ================= STATE ================= */
+    var allRecords = [];
+    var filtered = [];
+    var summaryRecs = [];   // records ignoring the variant filter, so every variant stays visible in the summary
+    var state = { employee: "", variant: "", start: "", end: "", periodText: "", search: "", sortKey: "date", sortDir: 1, page: 1, pageSize: 10 };
+
+    var $ = function (id) { return document.getElementById(id); };
+    var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    var MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    /* ================= PERIOD (WEEK / MONTH / YEAR) ================= */
+    function isoLocal(d) {
+      return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
+    }
+    function parseIso(s) {
+      var p = s.split("-");
+      return new Date(+p[0], +p[1] - 1, +p[2]);
+    }
+    function weekRange(d) {           // Monday to Sunday
+      var offset = (d.getDay() + 6) % 7;
+      var s = new Date(d.getFullYear(), d.getMonth(), d.getDate() - offset);
+      var e = new Date(s.getFullYear(), s.getMonth(), s.getDate() + 6);
+      return [isoLocal(s), isoLocal(e)];
+    }
+    function monthRange(y, m) { return [isoLocal(new Date(y, m, 1)), isoLocal(new Date(y, m + 1, 0))]; }
+    function yearRange(y) { return [y + "-01-01", y + "-12-31"]; }
+
+    function populateYears() {
+      var now = new Date().getFullYear();
+      var years = {};
+      years[now] = years[now - 1] = 1;
+      allRecords.forEach(function (r) { years[r.date.slice(0, 4)] = 1; });
+      $("fYear").innerHTML = Object.keys(years).sort().reverse()
+        .map(function (y) { return '<option value="' + y + '">' + y + "</option>"; }).join("");
+      $("fYear").value = now;
+      $("fMonth").value = new Date().getMonth();
+    }
+    function setYear(y) {
+      if (!$("fYear").querySelector('option[value="' + y + '"]')) {
+        $("fYear").insertAdjacentHTML("beforeend", '<option value="' + y + '">' + y + "</option>");
+      }
+      $("fYear").value = y;
+    }
+
+    // Shows the right input for the chosen period and fills Start/End Date from it.
+    function syncPeriod() {
+      var p = $("fPeriod").value, range = null, label = "Select Period";
+      $("fWeekDay").hidden = p !== "week";
+      $("fMonth").hidden = p !== "month";
+      $("fYear").hidden = p !== "month" && p !== "year";
+      $("fNone").hidden = p !== "all" && p !== "custom" && p !== "today";
+      $("fNone").value = p === "custom" ? "Use Start / End Date →" : p === "today" ? fmtDate(isoLocal(new Date())) : "—";
+      $("fStart").disabled = $("fEnd").disabled = p !== "custom";
+
+      if (p === "today") {
+        label = "Today";
+        range = [isoLocal(new Date()), isoLocal(new Date())];
+      } else if (p === "week") {
+        label = "Pick any day in the week";
+        if (!$("fWeekDay").value) $("fWeekDay").value = isoLocal(new Date());
+        range = weekRange(parseIso($("fWeekDay").value));
+      } else if (p === "month") {
+        label = "Month & Year";
+        range = monthRange(+$("fYear").value, +$("fMonth").value);
+      } else if (p === "year") {
+        label = "Year";
+        range = yearRange(+$("fYear").value);
+      } else if (p === "all") {
+        $("fStart").value = $("fEnd").value = "";
+      }
+      $("periodLabel").textContent = label;
+
+      if (range) {
+        $("fStart").value = range[0];
+        $("fEnd").value = range[1];
+        $("periodHint").textContent = fmtDate(range[0]) + "  →  " + fmtDate(range[1]);
+      } else {
+        $("periodHint").textContent = "";
+      }
+    }
+
+    function periodText() {
+      var p = $("fPeriod").value, s = $("fStart").value, e = $("fEnd").value;
+      if (p === "today") return "Today: " + fmtDate(s);
+      if (p === "week") return "Week: " + fmtDate(s) + " → " + fmtDate(e);
+      if (p === "month") return "Month: " + MONTH_NAMES[+$("fMonth").value] + " " + $("fYear").value;
+      if (p === "year") return "Year: " + $("fYear").value;
+      if (p === "custom" && (s || e)) return "Date: " + (s ? fmtDate(s) : "Beginning") + " → " + (e ? fmtDate(e) : "Today");
+      return "";
+    }
+
+    function applyPreset(name) {
+      var t = new Date();
+      switch (name) {
+        case "today": $("fPeriod").value = "today"; break;
+        case "thisWeek": $("fPeriod").value = "week"; $("fWeekDay").value = isoLocal(t); break;
+        case "lastWeek": $("fPeriod").value = "week";
+          $("fWeekDay").value = isoLocal(new Date(t.getFullYear(), t.getMonth(), t.getDate() - 7)); break;
+        case "thisMonth": $("fPeriod").value = "month"; $("fMonth").value = t.getMonth(); setYear(t.getFullYear()); break;
+        case "lastMonth": var lm = new Date(t.getFullYear(), t.getMonth() - 1, 1);
+          $("fPeriod").value = "month"; $("fMonth").value = lm.getMonth(); setYear(lm.getFullYear()); break;
+        case "thisYear": $("fPeriod").value = "year"; setYear(t.getFullYear()); break;
+        case "lastYear": $("fPeriod").value = "year"; setYear(t.getFullYear() - 1); break;
+      }
+      syncPeriod();
+      doApply();
+      document.querySelectorAll(".preset").forEach(function (b) {
+        b.classList.toggle("active", b.dataset.preset === name);
+      });
+    }
+    function clearPresetHighlight() {
+      document.querySelectorAll(".preset.active").forEach(function (b) { b.classList.remove("active"); });
+    }
+
+    /* ================= HELPERS ================= */
+    function fmtDate(iso) {           // 2026-10-05 -> 05-Oct-2026
+      var p = iso.split("-");
+      return p[2] + "-" + MONTHS[+p[1] - 1] + "-" + p[0];
+    }
+    function toIso(zohoDate) {        // 05-Oct-2026 -> 2026-10-05
+      if (/^\d{4}-\d{2}-\d{2}$/.test(zohoDate)) return zohoDate;
+      var p = String(zohoDate).split("-");
+      var m = ("0" + (MONTHS.indexOf(p[1]) + 1)).slice(-2);
+      return p[2] + "-" + m + "-" + ("0" + p[0]).slice(-2);
+    }
+    function fmtNum(n) { return Number(n).toLocaleString("en-IN"); }
+    function fmtAmt(n) {
+      return "₹" + Number(n).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function initials(name) {         // first two words of the name part (before " - ")
+      return name.split(" - ")[0].trim().split(/\s+/).map(function (w) { return w[0]; }).join("").slice(0, 2).toUpperCase();
+    }
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    function displayValue(v) {        // lookup fields come back as objects
+      if (v && typeof v === "object") return v.display_value || v.zc_display_value || "";
+      return v == null ? "" : String(v);
+    }
+
+    /* ================= DATA LOADING ================= */
+    function loadData() {
+      if (USE_SAMPLE_DATA || typeof ZOHO === "undefined") {
+        return Promise.resolve(SAMPLE_RECORDS.slice());
+      }
+      var f = ZOHO_CONFIG.fields;
+      return ZOHO.CREATOR.init().then(function () {
+        return ZOHO.CREATOR.DATA.getRecords({
+          app_name: ZOHO_CONFIG.appName,
+          report_name: ZOHO_CONFIG.reportName,
+          max_records: 1000
+        });
+      }).then(function (res) {
+        return (res.data || []).map(function (r) {
+          return {
+            employee: displayValue(r[f.employee]),
+            date: toIso(r[f.date]),
+            variant: displayValue(r[f.variant]),
+            quantity: parseFloat(r[f.quantity]) || 0,
+            amount: parseFloat(r[f.amount]) || 0
+          };
+        });
+      }).catch(function (err) {
+        console.error("Zoho load failed, showing sample data", err);
+        return SAMPLE_RECORDS.slice();
+      });
+    }
+
+    // Employee dropdown follows the selected Packing Variant: only employees who worked
+    // in that variant are listed, grouped by company. No variant selected = everyone.
+    function populateEmployees() {
+      var sel = $("fEmployee"), v = $("fVariant").value, prev = sel.value, byCo = {}, valid = {};
+      allRecords.forEach(function (r) {
+        if (v && r.variant !== v) return;
+        var co = EMP_COMPANY[r.employee] || "Others";
+        (byCo[co] = byCo[co] || {})[r.employee] = 1;
+        valid[r.employee] = 1;
+      });
+      var order = COMPANIES.map(function (c) { return c[0]; }).concat(["Others"]);
+      var html = '<option value="">All Employees</option>';
+      order.forEach(function (co) {
+        if (!byCo[co]) return;
+        html += '<optgroup label="' + esc(co) + '">' + Object.keys(byCo[co]).sort().map(function (n) {
+          return '<option value="' + esc(n) + '">' + esc(n) + "</option>";
+        }).join("") + "</optgroup>";
+      });
+      sel.innerHTML = html;
+      sel.value = valid[prev] ? prev : "";
+    }
+
+    // Known variants first, then any extra ones found in the data.
+    function populateVariants() {
+      var extra = Array.from(new Set(allRecords.map(function (r) { return r.variant; })))
+        .filter(function (v) { return v && PACKING_VARIANTS.indexOf(v) === -1; }).sort();
+      $("fVariant").innerHTML = '<option value="">All Variants</option>' +
+        PACKING_VARIANTS.concat(extra).map(function (v) { return '<option value="' + esc(v) + '">' + esc(v) + "</option>"; }).join("");
+    }
+
+    /* ================= FILTER / SORT ================= */
+    function applyFilters() {
+      var q = state.search.toLowerCase();
+      filtered = allRecords.filter(function (r) {
+        if (state.employee && r.employee !== state.employee) return false;
+        if (state.variant && r.variant !== state.variant) return false;
+        if (state.start && r.date < state.start) return false;
+        if (state.end && r.date > state.end) return false;
+        if (q && (displayName(r) + " " + r.company + " " + fmtDate(r.date) + " " + r.variant + " " + r.quantity + " " + r.amount).toLowerCase().indexOf(q) === -1) return false;
+        return true;
+      });
+      render();
+    }
+
+    /* ================= RENDER ================= */
+    var VARIANT_SHORT = {
+      "KATTU PACKING": "KATTU", "PACKET PACKING": "PACKET", "POUCH EDAI PACKING": "POUCH EDAI",
+      "POUCH LABEL EDAI PACKING": "POUCH LABEL EDAI", "COMPANY WORK": "COMPANY WORK", "MACHINE WORK": "MACHINE WORK", "POUCH PACKING": "POUCH"
+    };
+    var VARIANT_UNIT = {
+      "KATTU PACKING": "KATTU", "PACKET PACKING": "PACKET", "POUCH EDAI PACKING": "POUCH",
+      "POUCH LABEL EDAI PACKING": "POUCH", "COMPANY WORK": "Hrs", "MACHINE WORK": "Hrs", "POUCH PACKING": "POUCH"
+    };
+    function shortVariant(v) { return VARIANT_SHORT[v] || String(v).toUpperCase(); }
+    function unitOf(v) { return VARIANT_UNIT[v] || ""; }
+    function baseName(label) { return String(label).split(/\s*-?\s*KATTU\b/i)[0].trim().toUpperCase(); }
+    // Employee name shown as:  NAME - VARIANT - COMPANY   e.g. EESWARI - PACKET - SHED
+    function displayName(r) { return r.base + " - " + shortVariant(r.variant) + " - " + (r.company || "OTHERS"); }
+    function withUnit(n, v) { var u = unitOf(v); return fmtNum(n) + (u ? " " + u : ""); }
+
+    function render() {
+      var totalQty = 0, totalAmt = 0, emps = {}, tree = {};
+      filtered.forEach(function (r) {
+        totalQty += r.quantity; totalAmt += r.amount; emps[r.employee] = 1;
+        var co = r.company || "Others", v = r.variant || "(No Variant)";
+        var c = tree[co] || (tree[co] = { amount: 0, emps: {}, vars: {} });
+        var g = c.vars[v] || (c.vars[v] = { qty: 0, amount: 0, rows: [] });
+        g.rows.push(r); g.qty += r.quantity; g.amount += r.amount;
+        c.amount += r.amount; c.emps[r.employee] = 1;
+      });
+
+      $("tEmp").textContent = Object.keys(emps).length;
+      $("tRec").textContent = fmtNum(filtered.length);
+      $("tQty").textContent = fmtNum(totalQty);
+      $("tAmt").textContent = fmtAmt(totalAmt);
+
+      if (!filtered.length) {
+        $("tbody").innerHTML = '<tr><td colspan="5" class="empty"><strong>No records found</strong>Try another employee, variant or date range.</td></tr>';
+        $("tfoot").innerHTML = "";
+      } else {
+        var html = "";
+        var coOrder = COMPANIES.map(function (c) { return c[0]; }).concat(["Others"]);
+        coOrder.forEach(function (co) {
+          var c = tree[co];
+          if (!c) return;
+          html += '<tr class="grp-co"><td colspan="4">' + esc(co) + '<span class="grp-count">' + Object.keys(c.emps).length + ' employees</span></td>' +
+            '<td class="num">' + fmtAmt(c.amount) + "</td></tr>";
+          var vNames = PACKING_VARIANTS.filter(function (v) { return c.vars[v]; })
+            .concat(Object.keys(c.vars).filter(function (v) { return PACKING_VARIANTS.indexOf(v) === -1; }).sort());
+          vNames.forEach(function (vn) {
+            var g = c.vars[vn];
+            html += '<tr class="grp-var"><td colspan="3">' + esc(co + " - " + shortVariant(vn)) + "</td>" +
+              '<td class="num">' + withUnit(g.qty, vn) + '</td><td class="num">' + fmtAmt(g.amount) + "</td></tr>";
+            g.rows.sort(function (a, b) { return a.base < b.base ? -1 : a.base > b.base ? 1 : a.date < b.date ? -1 : 1; });
+            g.rows.forEach(function (r, i) {
+              html += "<tr><td>" + (i + 1) + "</td>" +
+                '<td><div class="emp-cell"><span class="avatar">' + esc(initials(r.base)) + '</span><div class="emp-name">' + esc(displayName(r)) + "</div></div></td>" +
+                "<td>" + fmtDate(r.date) + "</td>" +
+                '<td class="num">' + withUnit(r.quantity, vn) + '</td><td class="num">' + fmtAmt(r.amount) + "</td></tr>";
+            });
+          });
+        });
+        $("tbody").innerHTML = html;
+        $("tfoot").innerHTML = '<tr><td colspan="4">Grand Total</td><td class="num">' + fmtAmt(totalAmt) + "</td></tr>";
+      }
+
+      $("recCount").textContent = fmtNum(filtered.length) + (filtered.length === 1 ? " record" : " records");
+      renderChips();
+    }
+
+    function renderChips() {
+      var chips = [];
+      chips.push(state.employee ? "Employee: " + esc(state.employee) : "All Employees");
+      chips.push(state.variant ? "Variant: " + esc(state.variant) : "All Variants");
+      if (state.periodText) chips.push(esc(state.periodText));
+      $("activeFilters").innerHTML = chips.map(function (c) { return '<span class="chip">' + c + "</span>"; }).join("");
+    }
+
+    /* ================= EVENTS ================= */
+    function doApply() {
+      var start = $("fStart").value, end = $("fEnd").value, err = $("formError");
+      if (start && end && start > end) {
+        err.textContent = "Start Date cannot be after End Date.";
+        err.style.display = "block";
+        return;
+      }
+      err.style.display = "none";
+      state.employee = $("fEmployee").value;
+      state.variant = $("fVariant").value;
+      state.start = start;
+      state.end = end;
+      state.periodText = periodText();
+      state.page = 1;
+      applyFilters();
+    }
+
+    $("filterForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      doApply();
+    });
+
+    // Changing the variant narrows the employee list to that variant's employees.
+    $("fVariant").addEventListener("change", function () { populateEmployees(); doApply(); });
+
+    ["fPeriod", "fWeekDay", "fMonth", "fYear"].forEach(function (id) {
+      $(id).addEventListener("change", function () { syncPeriod(); clearPresetHighlight(); });
+    });
+    ["fStart", "fEnd"].forEach(function (id) {
+      $(id).addEventListener("change", clearPresetHighlight);
+    });
+
+    $("presets").addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-preset]");
+      if (b) applyPreset(b.dataset.preset);
+    });
+
+    $("btnReset").addEventListener("click", function () {
+      $("filterForm").reset();
+      $("fWeekDay").value = "";
+      populateEmployees();
+      populateYears();
+      syncPeriod();
+      clearPresetHighlight();
+      $("fSearch").value = "";
+      $("formError").style.display = "none";
+      state.employee = state.variant = state.start = state.end = state.periodText = state.search = "";
+      state.page = 1;
+      applyFilters();
+    });
+
+    $("fSearch").addEventListener("input", function () {
+      state.search = this.value.trim();
+      state.page = 1;
+      applyFilters();
+    });
+
+    $("btnPrint").addEventListener("click", function () { window.print(); });
+
+    $("btnExport").addEventListener("click", function () {
+      var csv = function (s) { return '"' + String(s).replace(/"/g, '""') + '"'; };
+      var lines = [["S.No", "Company", "Packing Variant", "Employee Name", "Date", "Quantity", "Unit", "Amount"].join(",")];
+      var a = 0;
+      filtered.slice().sort(function (x, y) {
+        var cx = COMPANIES.map(function (c) { return c[0]; }).indexOf(x.company), cy = COMPANIES.map(function (c) { return c[0]; }).indexOf(y.company);
+        return (cx - cy) || (PACKING_VARIANTS.indexOf(x.variant) - PACKING_VARIANTS.indexOf(y.variant)) || (x.base < y.base ? -1 : 1);
+      }).forEach(function (r, i) {
+        a += r.amount;
+        lines.push([i + 1, csv(r.company), csv(shortVariant(r.variant)), csv(displayName(r)), fmtDate(r.date), r.quantity, csv(unitOf(r.variant)), r.amount.toFixed(2)].join(","));
+      });
+      lines.push(["", "", "", "Grand Total", "", "", "", a.toFixed(2)].join(","));
+      var blob = new Blob(["\ufeff" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+      var link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "Employee_Salary_Report.csv";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    });
+
+    /* ================= INIT ================= */
+    loadData().then(function (records) {
+      allRecords = records;
+      allRecords.forEach(function (r) { r.company = EMP_COMPANY[r.employee] || ""; r.base = baseName(r.employee); });
+      populateVariants();
+      populateEmployees();
+      populateYears();
+      syncPeriod();
+      applyFilters();   // page opens with all employee details
+    });
+  </script>
+</body>
+
+</html>
